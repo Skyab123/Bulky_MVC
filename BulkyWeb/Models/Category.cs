@@ -8,7 +8,6 @@ namespace BulkyWeb.Models
         public int Id { get; set; } // PK van tabel (adhv data annotatie)
         [Required]
         public string Name { get; set; }
-
         public int DisplayOrder { get; set; }
     }
 }
