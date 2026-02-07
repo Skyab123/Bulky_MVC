@@ -153,3 +153,121 @@ Stappen:
              ```
 
         2. Nu moet je enkel de DB nog eens updaten en zal de tabel zichtbaar zijn. De migraties worden ook opgeslaan in de code & DB.
+
+## Aanmaken van een nieuw tabblad
+
+### Controller aanmaken voor dat tabblad
+
+In ons geval gaan we de klasse **Category** gebruiken.
+Het doel is dus om een lijst van categoriëen weer te geven.
+
+=> D.w.z.: de tabel in de DB opvullen, uitlezen en weergeven op het scherm.
+
+- Eerst moeten we de navigatie naar dat tabblad mogelijk maken:
+
+1. Aanmaken van een Controller:
+
+    ```csharp
+    using BulkyWeb.Data;
+    using BulkyWeb.Models;
+    using Microsoft.AspNetCore.Mvc;
+
+    namespace BulkyWeb.Controllers
+    {   
+        public class CategoryController : Controller
+        {
+            private readonly ApplicationDbContext _db;
+
+            public CategoryController(ApplicationDbContext db) 
+            {
+                _db = db;
+            }
+
+            public IActionResult Index()
+            {
+                List<Category> objCategoryList = _db.Categories.ToList();
+                return View(objCategoryList);
+            }
+        }
+    }
+    ```
+
+    -> We gaan de DBcontext injecteren in de constructor zodat de die kunnen gebruiken om data uit de DB te fetchen of erin te steken.
+
+    We gebruiken een **ActionResult** om de view aan te maken:
+
+    - Het idee: ```localhost:7000/[controller]/[action]```
+
+        -> Dus **Category** zal hier de ```controller``` zijn & de ActionResult **Index** is de ```action```. Met die URL kom je op dat tabblad.
+
+        -> Bij de eerste keer surfen zal je normaliter een foutmelding krijgen, omdat er nog geen index is om te tonen (HTML).
+
+    - In de views moet je een folder aanmaken van de controller & daarin zet je de views die je wilt weergeven:
+
+        - In die view kan je **HTML** schrijven. Voor we dit doen gaan we eerst het tabblad in de header toevoegen, zodat je kan surfen zonder in de URL te moeten typen.
+
+        - In de **Shared** folder zit onze layout-HTML voor alle pagina's. Daar zullen we de header aanpassen zodat er een link (anchor) bijkomt.
+
+        Voorbeeldcode **_Layout.cshtml:**
+
+        ```csharp
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Category</a> // Hier hebben we de controller toegevoegd.
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </li>
+            </ul>
+        </div>
+        ```
+
+        - Bij het klikken op die link zal je op de url komen die we hierboven gedefinieerd hebbben.
+
+2. De database opvullen met data zodat we die erna kunnen fetchen
+
+We moeten de methode van **DbContext** overriden zodat we de **Categories** tabel kunnen opvullen.
+
+```csharp
+using BulkyWeb.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace BulkyWeb.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+
+        }
+
+        public DbSet<Category> Categories { get; set; } // Tabel voor in DB
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) // Tabel opvullen met data (Bouwen van uw Model)
+        {
+            modelBuilder.Entity<Category>()
+                .HasData(
+                new Category { Id = 1, Name="Action", DisplayOrder = 1},
+                new Category { Id = 2, Name = "SciFi", DisplayOrder = 2 },
+                new Category { Id = 3, Name = "History", DisplayOrder = 3 }
+                );
+        }
+    }
+}
+```
+
+=> **Belangrijk:** Doe een nieuwe migration zodat de update in de DB terecht komt. Controleer in de DB of het toegevoegd is.
+
+```csharp
+PM> Add-Migration SeedCategoryTable
+Build started...
+Build succeeded.
+To undo this action, use Remove-Migration.
+PM> Updata-Database
+```
+
+3.Het weergeven van de data op de webapplicatie
