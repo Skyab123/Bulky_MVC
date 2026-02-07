@@ -230,44 +230,44 @@ Het doel is dus om een lijst van categoriëen weer te geven.
 
 2. De database opvullen met data zodat we die erna kunnen fetchen
 
-We moeten de methode van **DbContext** overriden zodat we de **Categories** tabel kunnen opvullen.
+    We moeten de methode van **DbContext** overriden zodat we de **Categories** tabel kunnen opvullen.
 
-```csharp
-using BulkyWeb.Models;
-using Microsoft.EntityFrameworkCore;
+    ```csharp
+    using BulkyWeb.Models;
+    using Microsoft.EntityFrameworkCore;
 
-namespace BulkyWeb.Data
-{
-    public class ApplicationDbContext : DbContext
+    namespace BulkyWeb.Data
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public class ApplicationDbContext : DbContext
         {
+            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+            {
 
-        }
+            }
 
-        public DbSet<Category> Categories { get; set; } // Tabel voor in DB
+            public DbSet<Category> Categories { get; set; } // Tabel voor in DB
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) // Tabel opvullen met data (Bouwen van uw Model)
-        {
-            modelBuilder.Entity<Category>()
-                .HasData(
-                new Category { Id = 1, Name="Action", DisplayOrder = 1},
-                new Category { Id = 2, Name = "SciFi", DisplayOrder = 2 },
-                new Category { Id = 3, Name = "History", DisplayOrder = 3 }
-                );
+            protected override void OnModelCreating(ModelBuilder modelBuilder) // Tabel opvullen met data (Bouwen van uw Model)
+            {
+                modelBuilder.Entity<Category>()
+                    .HasData(
+                    new Category { Id = 1, Name="Action", DisplayOrder = 1},
+                    new Category { Id = 2, Name = "SciFi", DisplayOrder = 2 },
+                    new Category { Id = 3, Name = "History", DisplayOrder = 3 }
+                    );
+            }
         }
     }
-}
-```
+    ```
 
-=> **Belangrijk:** Doe een nieuwe migration zodat de update in de DB terecht komt. Controleer in de DB of het toegevoegd is.
+    => **Belangrijk:** Doe een nieuwe migration zodat de update in de DB terecht komt. Controleer in de DB of het toegevoegd is.
 
-```csharp
-PM> Add-Migration SeedCategoryTable
-Build started...
-Build succeeded.
-To undo this action, use Remove-Migration.
-PM> Updata-Database
-```
+    ```csharp
+    PM> Add-Migration SeedCategoryTable
+    Build started...
+    Build succeeded.
+    To undo this action, use Remove-Migration.
+    PM> Updata-Database
+    ```
 
-3.Het weergeven van de data op de webapplicatie
+3. Het weergeven van de data op de webapplicatie
