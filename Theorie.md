@@ -383,3 +383,97 @@ Het doel is dus om een lijst van categoriëen weer te geven.
     ```
 
 ## CRUD-functionaliteit (Database)
+
+Nu willen we dat de **Create** button wel degelijk een Category aanmaakt en toevoegt in de database.
+
+We gaan een nieuwe endpoint introduceren voor de **HTTP-POST** request.
+
+- Wat zijn endpoints?
+
+    Een endpoint= een URL + HTTP-methode die uitkomt op één van de methodes (actions.)
+
+    Volgende zaken zijn eigenlijk allemaal endpoints:
+
+    ```csharp
+    public IActionResult Index()
+    {
+        List<Category> objCategoryList = _db.Categories.ToList();
+        return View(objCategoryList);
+    }
+
+    public IActionResult Create()
+    {
+        return View();
+    }
+    [HttpPost]
+    public IActionResult Create(Category obj)   
+    {
+        _db.Categories.Add(obj);
+        _db.SaveChanges(); // werkelijke uitvoering
+        return RedirectToAction("Index", "Category"); // Indien in dezelfde controller is ActionResult genoeg
+    }
+    ```
+
+    1. ```csharp
+       public IActionResult Index()
+       ```
+
+        Endpoint:
+
+        ```GET /Category/Index```
+
+        => Wat geberut er als dit endpoint 'geraakt' wordt?
+
+        - Database wordt gelezen
+        - Lijst met categorieën wordt opgehaald
+        - View teruggestuurd met die lijst
+
+            -> Een MVC endpoint die HTML terugstuurt.
+
+    2. ```csharp
+       public IActionResult Create()
+       ```
+
+        Endpoint:
+
+        ```GET /Category/Create```
+
+        => Dit wordt geraakt als iemand naar de "Create Page" gaat.
+
+        - Geen database actie
+        - Gewoon een formulier tonen
+
+            -> Endpoint dat een formulierpagina toont.
+
+    3. ```csharp
+       [HttpPost]
+       public IActionResult Create(Category obj)
+       ```
+
+        Endpoint:
+
+        ```POST /Category/Create```
+
+        => Dit wordt geraakt wanneer iemand op de submit button klikt in het formulier.
+
+        Wat gebeurt er?
+
+        1. Browser stuurt form data -> POST request
+        2. Naar URL  ```/Category/Create```
+        3. Dat is het endpoint
+        4. Deze methode draait:
+
+            ```csharp
+            _db.Categories.Add(obj);
+            _db.SaveChanges();
+            ```
+
+            -> Hier gebeurt **de echte actie** (data opslaan)
+
+            Daarna:
+
+            ```csharp
+            return RedirectAction("Index", "Category");
+            ```
+
+            -> Browser wordt doorgestuurd naar GET /Category/Index (andere endpoint)
