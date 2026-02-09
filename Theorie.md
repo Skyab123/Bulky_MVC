@@ -186,6 +186,7 @@ Het doel is dus om een lijst van categoriëen weer te geven.
             public IActionResult Index()
             {
                 List<Category> objCategoryList = _db.Categories.ToList();
+                // Leest de data uit de tabel vd DB
                 return View(objCategoryList);
             }
         }
@@ -271,3 +272,114 @@ Het doel is dus om een lijst van categoriëen weer te geven.
     ```
 
 3. Het weergeven van de data op de webapplicatie
+
+    -> Hier zullen we gebruik maken van Csharp code gemengd met HTML code.
+
+    -> Er wordt gebruik gemaakt van bootstrapklassen & icons.
+
+    Voorbeeld:
+
+     ```csharp
+     @model List<Category> // We willen de lijst van Categoriëen weergeven
+
+    <div class="container">
+        <div class="row pt-4 pb-3">
+            <div class="col-6">
+                <h2 class="text-primary">Category List</h2>
+            </div>
+            <div class="col-6 text-end">
+                <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create New Category</a>
+            </div>
+        </div>
+    
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Category Name
+                </th>
+                <th>
+                    Display Order
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            // Iteren over alle categoriën (LINQ voor volgorde)
+            @foreach (var cat in Model.OrderBy(u => u.DisplayOrder))
+            {
+                <tr>
+                    <td>@cat.Name</td>
+                    <td>@cat.DisplayOrder</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    </div>
+     ```
+
+    - We hebben dus ook een nieuwe action geïntroduceerd om een Categorie te creëren.
+    - In de **Category** Controller gaan we dus een nieuwe View aanmaken om daar dan een form weer te geven.
+
+    ```csharp
+    public IActionResult Create()
+    {
+        return View();
+    }
+    ```
+
+    - Vergeet niet de view ook met de juiste naam aan te maken
+
+    ```csharp
+    @model Category // Automatische instantiatie
+
+    <form method="post">
+        <div class="border p-3 mt-4">
+            <div class="row-pb-2">
+                <h2 class="text-primary">Create Category</h2>
+                <hr/>
+            </div>
+            <div class="mb-3 row p-1">
+                <label asp-for="Name" class="p-0"></label>
+                <input asp-for="Name" class="form-control"/>
+            </div>
+            <div class="mb-3 row p-1">
+                <label asp-for="DisplayOrder" class="p-0"></label>
+                <input asp-for="DisplayOrder" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form form-control">Create</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Category" asp-action="Index" class="btn btn-secondary border-2 border-black  form-control">Back to list</a>
+            </div>
+        </div>
+    </form>
+    ```
+
+    -> In de ActionResult moet je dus geen object van Category instantiëren, dit zal .NET core zelf doen via de **@model Category**
+
+    -> We gebruiken in de labels & inputs **asp-for** om de properties van het object weer te geven & te binden.
+
+    -> In de view zal de label weergegeven worden zoals de property zelf, indien je een ander naam wilt of spaties wilt toevoegen gaan we terug **annotatie** toevoegen.
+
+    Toevoegen annotaties:
+
+    ```csharp
+    public class Category
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        [DisplayName("Category Name")] // Layout voor view
+        public string Name { get; set; }
+        [DisplayName("Display Order")] // Layout voor view
+        public int DisplayOrder { get; set; }
+    }
+    ```
+
+## CRUD-functionaliteit (Database)
