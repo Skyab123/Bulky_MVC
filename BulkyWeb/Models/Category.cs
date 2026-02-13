@@ -14,7 +14,7 @@ namespace BulkyWeb.Models
         public string Name { get; set; }
 
         [DisplayName("Display Order")]
-        [Range(1, 100)]
+        [Range(1, 100, ErrorMessage = "Displayorder must be between 1-100")]
         public int DisplayOrder { get; set; }
     }
 }

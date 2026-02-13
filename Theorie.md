@@ -478,9 +478,11 @@ We gaan een nieuwe endpoint introduceren voor de **HTTP-POST** request.
 
             -> Browser wordt doorgestuurd naar GET /Category/Index (andere endpoint)
 
+### Server-side validation
+
 Nu willen we natuurlijk valideren wat er ingegeven wordt. Dit doen we adhv in de klasse zelf te definiëren wat iets moet zijn & in de HTML code laten we de foutmelding zien.
 
-Voorbeeld -> Een foute categorie meegeven:
+Voorbeeld van Server-Side Validation-> Een foute categorie meegeven:
 
 ```csharp
 public class Category
@@ -494,11 +496,12 @@ public class Category
     public string Name { get; set; }
 
     [DisplayName("Display Order")]
-    [Range(1, 100)] // Validatiecheck
+    [Range(1, 100, ErrorMessage = "...")] // Validatiecheck
     public int DisplayOrder { get; set; }
 }     
 ```
 
+- Indien je een andere message wilt kan je die in de validatiezelf aanpassen (zie hierboven).
 - Nu gaan we in de Controller vd klasse zorgen dat er geen onvolledig object doorgegeven kan worden:
 
 ```csharp
@@ -531,3 +534,58 @@ Voorbeeld voor **'Category':**
     <span asp-validation-for="DisplayOrder" class="text-danger"></span> // Idem voor DisplayOrder
 </div>
 ```
+
+---
+
+Uiteraard kan je ook **Custom Validations** doen
+
+-> Bv je wilt niet dat 'Name' & 'DisplayOrder' hetzelfde kunnen zijn.
+
+```csharp
+public IActionResult Create(Category obj)
+{
+    if (obj.Name == obj.DisplayOrder.ToString()) // Als ze gelijk zijn
+    {
+        ModelState.AddModelError("name", "The Displayorder cannot exactly match the Name!");
+    }
+    if (ModelState.IsValid) 
+    {
+        _db.Categories.Add(obj);
+        _db.SaveChanges();
+        return RedirectToAction("Index", "Category");
+    }
+    return View();
+    
+}
+```
+
+- Het is ook mogelijk om in de HTML code een summar te maken van alle errors:
+
+```HTML
+<div asp-validation-summary="All"></div> -> Dit toont alle foutmelding in een samenvatting.
+```
+
+De mogelijke keuzes:
+
+- 'All' -> Dit zal alle soorten validaties tonen (zowel de Models als Modelstate validaties)
+- 'ModelOnly' -> deze zal enkel die van Models tonen
+- 'None' -> zal niets tonen
+
+### Client-side validation
+
+Deze validaties van hierboven zijn server-side validations. Dus het moet gevraagd worden aan de server/code en de pagina zal herladen worden.
+
+Indien je client-side validaties wilt doen, d.w.z. dat de pagina dus niet herladen moet worden & dat bij het gewoon typen in de inputvelden, het direct getoond wordt als je het niet correct ingeeft.
+
+-> Hiervoor is er een standaard JS-script aanwezig in de **Shared** folder, deze gaan we gewoon importeren in de HTML-code.
+
+```csharp
+@section Scripts{
+    @{ 
+    <partial name="_ValidationScriptsPartial"/>
+    }
+}
+```
+
+- Voeg dit toe onderaan de code: indien het geen scripts zou bevatten, kan je het in de code toevoegen zonder de **@**.
+- De naam moet perfect kloppen met de file in Shared.

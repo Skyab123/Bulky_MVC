@@ -26,6 +26,11 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
+            if (obj.Name == obj.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("Name", "The Displayorder cannot exactly match the Name!");
+            }
+
             if (ModelState.IsValid) // Validatie bij een object (elke prop zal moeten ingevuld zijn)
             {
                 _db.Categories.Add(obj);
