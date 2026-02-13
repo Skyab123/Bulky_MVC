@@ -26,9 +26,14 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
-            _db.Categories.Add(obj);
-            _db.SaveChanges(); // werkelijke uitvoering
-            return RedirectToAction("Index", "Category"); // Indien in dezelfde controller is ActionResult genoeg
+            if (ModelState.IsValid) // Validatie bij een object (elke prop zal moeten ingevuld zijn)
+            {
+                _db.Categories.Add(obj);
+                _db.SaveChanges(); // werkelijke uitvoering
+                return RedirectToAction("Index", "Category"); // Indien in dezelfde controller is ActionResult genoeg
+            }
+            return View();
+            
         }
     }
 }

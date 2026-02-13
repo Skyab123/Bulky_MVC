@@ -477,3 +477,57 @@ We gaan een nieuwe endpoint introduceren voor de **HTTP-POST** request.
             ```
 
             -> Browser wordt doorgestuurd naar GET /Category/Index (andere endpoint)
+
+Nu willen we natuurlijk valideren wat er ingegeven wordt. Dit doen we adhv in de klasse zelf te definiëren wat iets moet zijn & in de HTML code laten we de foutmelding zien.
+
+Voorbeeld -> Een foute categorie meegeven:
+
+```csharp
+public class Category
+{
+    [Key]
+    public int Id { get; set; } 
+
+    [Required]
+    [MaxLength(30)] // Validatiecheck
+    [DisplayName("Category Name")]
+    public string Name { get; set; }
+
+    [DisplayName("Display Order")]
+    [Range(1, 100)] // Validatiecheck
+    public int DisplayOrder { get; set; }
+}     
+```
+
+- Nu gaan we in de Controller vd klasse zorgen dat er geen onvolledig object doorgegeven kan worden:
+
+```csharp
+[HttpPost]
+public IActionResult Create(Category obj)
+{
+    if (ModelState.IsValid) // Validatie bij een object (elke prop zal moeten ingevuld zijn)
+    {
+        _db.Categories.Add(obj);
+        _db.SaveChanges(); // werkelijke uitvoering
+        return RedirectToAction("Index", "Category"); // Indien in dezelfde controller is ActionResult genoeg
+    }
+    return View(); // return gewoon dezelfde view
+}
+```
+
+- Nu willen we op die view natuurlijk een foutmelding weergeven. Met EF is dit zeer simpel en bestaat daar een HTML-tag voor namelijk: **asp-validation-for**.
+
+Voorbeeld voor **'Category':**
+
+```csharp
+<div class="mb-3 row p-1">
+    <label asp-for="Name" class="p-0"></label>
+    <input asp-for="Name" class="form-control"/>
+    <span asp-validation-for="Name" class="text-danger"></span> // Deze span zal dus enkel verschijnen bij een Error in de input van 'Name'
+</div>
+<div class="mb-3 row p-1">
+    <label asp-for="DisplayOrder" class="p-0"></label>
+    <input asp-for="DisplayOrder" class="form-control"/>
+    <span asp-validation-for="DisplayOrder" class="text-danger"></span> // Idem voor DisplayOrder
+</div>
+```
