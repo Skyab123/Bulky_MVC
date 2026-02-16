@@ -589,3 +589,22 @@ Indien je client-side validaties wilt doen, d.w.z. dat de pagina dus niet herlad
 
 - Voeg dit toe onderaan de code: indien het geen scripts zou bevatten, kan je het in de code toevoegen zonder de **@**.
 - De naam moet perfect kloppen met de file in Shared.
+
+## Edit & Delete buttons
+
+Dit is heel simpel: je maakt terug een link aan met daarin de **asp-properties** voor de navigatie. Je kan ook bootstrap-icons toevoegen voor het design.
+
+Voorbeeld:
+
+```csharp
+<td>
+    <div class="w-75 btn-group" role="group">
+        <a asp-controller="Category" asp-action="Edit" class="btn btn-primary mx-2">
+            <i class="bi bi-pencil-square">Edit</i>
+        </a>
+            <a asp-controller="Category" asp-action="Delete" class="btn btn-danger mx-2">
+                <i class="bi bi-trash-fill">Delete</i>
+            </a>
+    </div>
+</td>
+```
