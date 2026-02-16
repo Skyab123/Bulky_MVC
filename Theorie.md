@@ -608,3 +608,39 @@ Voorbeeld:
     </div>
 </td>
 ```
+
+## Edit-functionaliteit
+
+We gaan terug gelijk bij Create een Edit ActionResult aanmaken. 1 methode voor als je op Edit klikt & één voor de bevestiging indien je iets aangepast hebt.
+
+DbContext:
+
+```csharp
+public IActionResult Edit(int? id)
+{
+    if (id == null || id == 0) 
+    {
+        return NotFound();
+    }
+
+    Category? categoryFromDb = _db.Categories.FirstOrDefault(cat => cat.Id == id); // .Find() enkel op PK
+
+    if (categoryFromDb == null)
+    {
+        return NotFound();
+    }
+
+    return View(categoryFromDb);
+}
+```
+
+-> Dus wanneer iemand op Edit klikt, zal er eerst gechecked worden of er een id gevonden kan worden.
+
+-> Belangrijk: In de HTML-code zal je een **asp-route-id** moeten toevoegen, zodat EF weet welke Id je gekozen hebt:
+
+```csharp
+<a asp-controller="Category" asp-action="Edit" asp-route-id="@cat.Id" class="btn btn-primary mx-2"> /* @cat staat gedefinieerd bovenaan in een foreach-loop*/
+    <i class="bi bi-pencil-square">Edit</i>
+</a>
+```
+  
