@@ -678,3 +678,7 @@ public IActionResult Edit(Category obj)
     return View();
 }
 ```
+
+- Indien je de PK een andere naam zou geven dan **Id**, bv CategoryId. Dan zou dit problemen kunnen geven in de HTML, want hij zal niet weten wat de ID is en dus ipv een bestaande categorie te updaten, zal hij een nieuwe toevoegen (id == 0).
+
+- Om dat op te lossen moet je een hidden-input field toevoegen.
